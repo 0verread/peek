@@ -33,6 +33,8 @@ func Do(url string, args ...string) {
 		fmt.Println("Error reading response, error: ", err)
 		return
 	}
+	
+	fmt.Println(resp.Status)
 	fmt.Println(string(body))
 
 }

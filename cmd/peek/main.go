@@ -1,24 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"errors"
+	"fmt"
 	"net/url"
+	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/0verread/peek/internal/client"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use: "peek",
+	Use:     "peek",
 	Version: "0.1.0",
-	Short: "test apis better way",
+	Short:   "test apis better way",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("Requires an argument")
 		}
-		
+
 		fmt.Println("url: ", args[0])
 		url, err := url.Parse(args[0])
 
@@ -26,9 +26,7 @@ var rootCmd = &cobra.Command{
 			panic(err)
 		}
 
-		// host := url.Hostname()
 		port := url.Port()
-		// path := url.Path
 
 		if url.Scheme == "http" && port == "" {
 			fmt.Println("Need port for http request")
@@ -46,7 +44,6 @@ var rootCmd = &cobra.Command{
 		client.Do(args[0])
 		return nil
 	},
-
 }
 
 func main() {
