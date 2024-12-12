@@ -1,12 +1,17 @@
 package client
 
 import (
-	"encoding/json"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+)
+
+const (
+	Get  = "GET"
+	Post = "POST"
 )
 
 type HttpClient interface {
@@ -22,7 +27,7 @@ func NewHttpClient() DefaultClient {
 }
 
 func (dc DefaultClient) makeRequest(req Request) (Response, error) {
-	httpReq, err := http.NewRequest(req.Method, req.Url, strings.NewReader(req.Body))
+	httpReq, err := http.NewRequest(req.Method, req.Url, bytes.NewBuffer(req.Body))
 
 	if err != nil {
 		fmt.Println("Something wrong with building http new request")
@@ -36,6 +41,7 @@ func (dc DefaultClient) makeRequest(req Request) (Response, error) {
 		fmt.Println("Somehting went wrong to call API")
 		return Response{}, err
 	}
+	defer res.Body.Close()
 	respBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return Response{}, fmt.Errorf("Error in gettting response body")
@@ -49,25 +55,69 @@ func (dc DefaultClient) makeRequest(req Request) (Response, error) {
 	}, nil
 }
 
-func Do(url string, args ...string) {
-	var method string = "GET" // default it makes GET request
-	if len(args) > 0 {
-		if args[0] == "POST" {
-			fmt.Println(args[1])
-			var jsonData map[string]interface{}
-			_ = json.Unmarshal([]byte(args[1]), &jsonData)
-			fmt.Println(jsonData)
-			if args[1] == "" {
-				fmt.Println(args[1])
-			}
-			// method = "POST"
+func buildPostReq(url string, headers http.Header, payload []byte) (Request, error) {
+	if headers == nil {
+		headers = make(http.Header)
+	}
+
+	if headers.Get("Content-Type") == "" {
+		headers.Add("Content-Type", "application/json")
+	}
+
+	return Request{
+		Url:     url,
+		Method:  Post,
+		Headers: headers,
+		Body:    payload,
+	}, nil
+}
+
+func parseHeader(headerStr string) http.Header {
+	headers := make(http.Header)
+	if headerStr == "" {
+		return headers
+	}
+
+	// Split headers by semicolon
+	headerPairs := strings.Split(headerStr, ";")
+	for _, pair := range headerPairs {
+		parts := strings.Split(pair, ":")
+		if len(parts) == 2 {
+			headers.Add(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
 		}
 	}
-	respBody, err := NewHttpClient().makeRequest(Request{Url: url, Method: method, Body: ""})
+	return headers
+}
+
+func Do(url string, args ...string) {
+	var method string = Get // default it makes GET request
+	var payload []byte
+	var headers http.Header
+	var req Request
+	var err error
+
+	if len(args) > 0 && strings.EqualFold(args[0], Post) {
+		method = Post
+		if len(args) > 1 {
+			payload = []byte(args[1])
+		}
+		if len(args) > 2 {
+			headers = parseHeader(args[2])
+		}
+		req, err = buildPostReq(url, headers, payload)
+	} else {
+		req, err = Request{Url: url, Method: method}, nil
+	}
+
+	if err != nil {
+		fmt.Println("Error building request for POST, error:", err)
+		panic(0)
+	}
+	respBody, err := NewHttpClient().makeRequest(req)
 	if err != nil {
 		fmt.Println("Error in processing request")
 		fmt.Println(err)
 	}
-	fmt.Printf("Time Taken: %d ms\n", respBody.Latency)
+	fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
 	fmt.Println(respBody.Body)
 }

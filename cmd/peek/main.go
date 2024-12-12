@@ -43,7 +43,8 @@ var rootCmd = &cobra.Command{
 		fmt.Println("Running url: ", args[0])
 		verb, _ := cmd.Flags().GetString("verb")
 		payload, _ := cmd.Flags().GetString("data")
-		client.Do(args[0], verb, payload)
+		header, _ := cmd.Flags().GetString("header")
+		client.Do(args[0], verb, payload, header)
 		return nil
 	},
 }

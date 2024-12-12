@@ -20,7 +20,7 @@ type Request struct {
 	Url     string
 	Method  string
 	Headers http.Header
-	Body    string
+	Body    []byte
 }
 
 type RequestError struct {
