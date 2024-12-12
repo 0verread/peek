@@ -41,12 +41,16 @@ var rootCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("Running url: ", args[0])
-		client.Do(args[0])
+		verb, _ := cmd.Flags().GetString("verb")
+		payload, _ := cmd.Flags().GetString("data")
+		client.Do(args[0], verb, payload)
 		return nil
 	},
 }
 
 func main() {
+	rootCmd.Flags().StringP("verb", "v", "GET", "HTTP verb")
+	rootCmd.Flags().StringP("data", "d", "", "data for POST request")
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
