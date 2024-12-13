@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
+
+	"github.com/0verread/peek/pkg/prettyjson"
 )
 
 const (
@@ -119,5 +122,12 @@ func Do(url string, args ...string) {
 		fmt.Println(err)
 	}
 	fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
-	fmt.Println(respBody.Body)
+	fmt.Println(reflect.TypeOf(respBody.Body))
+	data := map[string]interface{}{
+		"name":   "John Doe",
+		"age":    30,
+		"active": true,
+	}
+	coloredRespBody, _ := prettyjson.Prettify(data)
+	fmt.Println(coloredRespBody)
 }
