@@ -2,10 +2,10 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strings"
 	"time"
 
@@ -118,16 +118,15 @@ func Do(url string, args ...string) {
 	}
 	respBody, err := NewHttpClient().makeRequest(req)
 	if err != nil {
-		fmt.Println("Error in processing request")
-		fmt.Println(err)
+		fmt.Println("Error in processing request, error: ", err)
 	}
 	fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
-	fmt.Println(reflect.TypeOf(respBody.Body))
-	data := map[string]interface{}{
-		"name":   "John Doe",
-		"age":    30,
-		"active": true,
+	// fmt.Println(reflect.TypeOf(respBody.Body))
+	var jsonResp map[string]interface{}
+	err = json.Unmarshal([]byte(respBody.Body), &jsonResp)
+	if err != nil {
+		fmt.Println("Error", err)
 	}
-	coloredRespBody, _ := prettyjson.Prettify(data)
-	fmt.Println(coloredRespBody)
+	coloredRespBody, _ := prettyjson.Prettify(jsonResp)
+	fmt.Println(string(coloredRespBody))
 }

@@ -1,3 +1,5 @@
+// custom package to make json response colorful
+
 package prettyjson
 
 import (
@@ -10,8 +12,8 @@ import (
 )
 
 const (
-	startMap   = "{"
-	endMap     = "}"
+	startMap   = "{\n"
+	endMap     = "\n}"
 	startArray = "["
 	endArray   = "]"
 	emptyArray = startArray + endArray
@@ -49,11 +51,11 @@ func (f *Formatter) colorMap(m map[string]interface{}, buf *bytes.Buffer) error 
 	var first = true
 	for k, v := range m {
 		if !first {
-			buf.WriteString(",")
+			buf.WriteString(", \n")
 		}
 		first = false
 		// color the key
-		buf.WriteString(f.colorize(color.FgWhite, fmt.Sprintf("%q: ", k)))
+		buf.WriteString(f.colorize(color.FgWhite, fmt.Sprintf("  %q: ", k)))
 		if err := f.marshalValue(v, buf); err != nil {
 			return err
 		}
@@ -63,6 +65,7 @@ func (f *Formatter) colorMap(m map[string]interface{}, buf *bytes.Buffer) error 
 }
 
 func (f *Formatter) marshalValue(value interface{}, buf *bytes.Buffer) error {
+	// fmt.Println(value, reflect.TypeOf(value))
 	switch v := value.(type) {
 	case string:
 		f.colorString(v, buf)
@@ -84,24 +87,6 @@ func (f *Formatter) marshalValue(value interface{}, buf *bytes.Buffer) error {
 	return nil
 }
 
-func (f *Formatter) marshalArray(arr []interface{}, buf *bytes.Buffer, depth int) error {
-	if len(arr) == 0 {
-		buf.WriteString(emptyArray)
-	}
-	buf.WriteString(startArray)
-
-	for i, v := range arr {
-		if i > 0 {
-			buf.WriteByte(',')
-		}
-		if err := f.marshalValue(v, buf); err != nil {
-			return err
-		}
-	}
-	buf.WriteString(endArray)
-	return nil
-}
-
 func (f *Formatter) Prettify(jsonObj interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := f.marshalValue(jsonObj, &buf); err != nil {
@@ -111,6 +96,6 @@ func (f *Formatter) Prettify(jsonObj interface{}) ([]byte, error) {
 }
 
 func Prettify(jsonObj interface{}) ([]byte, error) {
-	fmt.Println(jsonObj)
+	// fmt.Println(NewFormatter().Prettify(jsonObj))
 	return NewFormatter().Prettify(jsonObj)
 }
