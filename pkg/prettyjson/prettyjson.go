@@ -14,8 +14,8 @@ import (
 const (
 	startMap   = "{\n"
 	endMap     = "\n}"
-	startArray = "["
-	endArray   = "]"
+	startArray = "[\n"
+	endArray   = "\n]"
 	emptyArray = startArray + endArray
 )
 
@@ -64,6 +64,21 @@ func (f *Formatter) colorMap(m map[string]interface{}, buf *bytes.Buffer) error 
 	return nil
 }
 
+func (f *Formatter) colorArrayMap(arr []map[string]interface{}, buf *bytes.Buffer) error {
+	buf.WriteString(startArray)
+	for i, v := range arr {
+		if i > 0 {
+			buf.WriteString(",")
+		}
+		buf.WriteString("  ")
+		if err := f.colorMap(v, buf); err != nil {
+			return err
+		}
+	}
+	buf.WriteString(endArray)
+	return nil
+}
+
 func (f *Formatter) marshalValue(value interface{}, buf *bytes.Buffer) error {
 	switch v := value.(type) {
 	case string:
@@ -78,6 +93,8 @@ func (f *Formatter) marshalValue(value interface{}, buf *bytes.Buffer) error {
 		return f.colorArray(v, buf)
 	case map[string]interface{}:
 		return f.colorMap(v, buf)
+	case []map[string]interface{}:
+		return f.colorArrayMap(v, buf)
 	case json.Number:
 		buf.WriteString(f.colorize(color.FgCyan, v.String()))
 	default:

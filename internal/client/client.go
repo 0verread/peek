@@ -126,6 +126,8 @@ func Do(url string, args ...string) {
 		fmt.Println("Error in processing request, error: ", err)
 	}
 	fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
+	// fmt.Println(respBody.Body)
+	// cout.PrettyPrintString(respBody.Status)
 	cout.PrettyPrint([]byte(respBody.Body))
 	// var jsonResp map[string]interface{}
 	// err = json.Unmarshal([]byte(respBody.Body), &jsonResp)
