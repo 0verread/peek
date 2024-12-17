@@ -65,7 +65,6 @@ func (f *Formatter) colorMap(m map[string]interface{}, buf *bytes.Buffer) error 
 }
 
 func (f *Formatter) marshalValue(value interface{}, buf *bytes.Buffer) error {
-	// fmt.Println(value, reflect.TypeOf(value))
 	switch v := value.(type) {
 	case string:
 		f.colorString(v, buf)
@@ -96,6 +95,5 @@ func (f *Formatter) Prettify(jsonObj interface{}) ([]byte, error) {
 }
 
 func Prettify(jsonObj interface{}) ([]byte, error) {
-	// fmt.Println(NewFormatter().Prettify(jsonObj))
 	return NewFormatter().Prettify(jsonObj)
 }

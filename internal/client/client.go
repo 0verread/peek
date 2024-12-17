@@ -2,19 +2,20 @@ package client
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/0verread/peek/pkg/prettyjson"
+	"github.com/0verread/peek/internal/cout"
 )
 
 const (
-	Get  = "GET"
-	Post = "POST"
+	Get    = "GET"
+	Post   = "POST"
+	Delete = "DELETE"
+	Put    = "PUT"
 )
 
 type HttpClient interface {
@@ -93,14 +94,18 @@ func parseHeader(headerStr string) http.Header {
 }
 
 func Do(url string, args ...string) {
-	var method string = Get // default it makes GET request
+	var verb string = Get // default it makes GET request
 	var payload []byte
 	var headers http.Header
 	var req Request
 	var err error
 
-	if len(args) > 0 && strings.EqualFold(args[0], Post) {
-		method = Post
+	if len(args) > 0 {
+		verb = args[0]
+	}
+
+	if len(args) > 0 && (strings.EqualFold(verb, Post) || strings.EqualFold(verb, Put)) {
+		verb = Post
 		if len(args) > 1 {
 			payload = []byte(args[1])
 		}
@@ -109,7 +114,7 @@ func Do(url string, args ...string) {
 		}
 		req, err = buildPostReq(url, headers, payload)
 	} else {
-		req, err = Request{Url: url, Method: method}, nil
+		req, err = Request{Url: url, Method: verb}, nil
 	}
 
 	if err != nil {
@@ -121,12 +126,12 @@ func Do(url string, args ...string) {
 		fmt.Println("Error in processing request, error: ", err)
 	}
 	fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
-	// fmt.Println(reflect.TypeOf(respBody.Body))
-	var jsonResp map[string]interface{}
-	err = json.Unmarshal([]byte(respBody.Body), &jsonResp)
-	if err != nil {
-		fmt.Println("Error", err)
-	}
-	coloredRespBody, _ := prettyjson.Prettify(jsonResp)
-	fmt.Println(string(coloredRespBody))
+	cout.PrettyPrint([]byte(respBody.Body))
+	// var jsonResp map[string]interface{}
+	// err = json.Unmarshal([]byte(respBody.Body), &jsonResp)
+	// if err != nil {
+	// 	fmt.Println("Error", err)
+	// }
+	// coloredRespBody, _ := prettyjson.Prettify(jsonResp)
+	// fmt.Println(string(coloredRespBody))
 }
