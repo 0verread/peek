@@ -3,13 +3,13 @@ package cout
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 )
+
+type unmarshalArrayResp []map[string]interface{}
 
 func unmarshalObject(data []byte, result interface{}) error {
 	switch result.(type) {
 	case map[string]interface{}:
-		fmt.Println(json.Unmarshal(data, result))
 		return json.Unmarshal(data, result)
 	case interface{}:
 		return json.Unmarshal(data, result)
@@ -18,31 +18,14 @@ func unmarshalObject(data []byte, result interface{}) error {
 }
 
 func unmarshalArray(data []byte, result interface{}) error {
-	resultType := reflect.TypeOf(result)
-	if resultType.Kind() != reflect.Ptr {
-		return fmt.Errorf("result must be a pointer")
+	// Ensure result is a pointer to a slice of maps
+	slicePtr, ok := result.(*[]map[string]interface{})
+	if !ok {
+		return fmt.Errorf("result must be a pointer to []map[string]interface{}")
 	}
 
-	// Get the underlying type
-	elemType := resultType.Elem()
-
-	// Check if it's a slice
-	if elemType.Kind() != reflect.Slice {
-		return fmt.Errorf("result must be a pointer to a slice")
-	}
-
-	// Create a new slice of the correct type
-	sliceType := reflect.SliceOf(elemType.Elem())
-	slice := reflect.New(sliceType).Elem()
-
-	// Unmarshal into the new slice
-	if err := json.Unmarshal(data, slice.Addr().Interface()); err != nil {
-		return fmt.Errorf("failed to unmarshal array: %v", err)
-	}
-
-	// Set the original result to the new slice
-	reflect.ValueOf(result).Elem().Set(slice)
-	return nil
+	// Unmarshal directly into the slice of maps
+	return json.Unmarshal(data, slicePtr)
 }
 
 // func to unmarshal the response based on response type
@@ -50,7 +33,7 @@ func unmarshalArray(data []byte, result interface{}) error {
 func UnmarshalResp(resp []byte, result interface{}) error {
 	var rawData interface{}
 	if err := json.Unmarshal(resp, &rawData); err != nil {
-		return fmt.Errorf("failed to parse Json: %v", err)
+		fmt.Println("failed to parse Json: ", err)
 	}
 	switch rawData.(type) {
 	case []interface{}:

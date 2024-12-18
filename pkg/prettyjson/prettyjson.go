@@ -70,7 +70,7 @@ func (f *Formatter) colorArrayMap(arr []map[string]interface{}, buf *bytes.Buffe
 		if i > 0 {
 			buf.WriteString(",")
 		}
-		buf.WriteString("  ")
+		buf.WriteString("\n  ")
 		if err := f.colorMap(v, buf); err != nil {
 			return err
 		}

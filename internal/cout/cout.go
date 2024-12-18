@@ -1,23 +1,51 @@
 package cout
 
 import (
+	"encoding/json"
 	"fmt"
-
 	"github.com/0verread/peek/pkg/prettyjson"
+	"log"
+	"os"
 )
 
 func PrettyPrintString(str string) {
 	coloredStr, _ := prettyjson.Prettify(str)
-	fmt.Println(string(coloredStr))
+	log.Println(string(coloredStr))
 }
 
 func PrettyPrint(resp []byte) {
-	var result []map[string]interface{}
-	err := UnmarshalResp(resp, &result)
-	if err != nil {
-		fmt.Println("Some errror", err)
+	var err error
+	var rawData interface{}
+	if err := json.Unmarshal(resp, &rawData); err != nil {
+		fmt.Println("failed to parse Json: ", err)
 	}
-	// fmt.Println(result)
-	coloredRespBody, _ := prettyjson.Prettify(result)
-	fmt.Println(string(coloredRespBody))
+
+	switch rawData.(type) {
+	case []interface{}:
+		var result []map[string]interface{}
+		// err = UnmarshalResp(resp, &result)
+		err = UnmarshalResp(resp, &result)
+		if err != nil {
+			log.Println("Error in Unmarshal Response, error: ", err)
+		}
+		coloredRespBody, err := prettyjson.Prettify(result)
+		if err != nil {
+			log.Println("Error in colored Response", err)
+		}
+		os.Stdout.Write(coloredRespBody)
+	case map[string]interface{}:
+		var result map[string]interface{}
+		// err = UnmarshalResp(resp, &result)
+		err = UnmarshalResp(resp, &result)
+		if err != nil {
+			log.Println("Error in Unmarshal Response, error: ", err)
+		}
+
+		coloredRespBody, err := prettyjson.Prettify(result)
+		if err != nil {
+			log.Println("Error in colored Response", err)
+		}
+		os.Stdout.Write(coloredRespBody)
+	}
+
 }
