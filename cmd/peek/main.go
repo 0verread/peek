@@ -3,11 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
+	"strconv"
+
+	"github.com/spf13/cobra"
 
 	"github.com/0verread/peek/internal/client"
-	"github.com/spf13/cobra"
+	"github.com/0verread/peek/internal/cout"
 )
 
 var rootCmd = &cobra.Command{
@@ -29,7 +33,7 @@ var rootCmd = &cobra.Command{
 		port := url.Port()
 
 		if url.Scheme == "http" && port == "" {
-			fmt.Println("Need port for http request")
+			log.Println("Need port for http request")
 			os.Exit(0)
 		}
 
@@ -42,14 +46,19 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("Running url: ", args[0])
 		verb, _ := cmd.Flags().GetString("verb")
-
 		payload, _ := cmd.Flags().GetString("data")
-
 		header, _ := cmd.Flags().GetString("header")
+		response, _ := client.Do(args[0], verb, payload, header)
+    // Colorize status and latency
+    statusColor := cout.PrettyPrintStatus(response.Status)
+    latencyColor := color.New(color.FgBlue).SprintFunc()
 
-		client.Do(args[0], verb, payload, header)
+    statusAndLat := fmt.Sprintf("Status: %s  Time Taken: %s ms\n", statusColor(response.Status), latencyColor(response.Latency))
+    os.Stdout.Write([]byte(statusAndLat))
+
+    cout.PrettyPrint([]byte(response.Body))
 		return nil
-	},
+	}
 }
 
 func main() {

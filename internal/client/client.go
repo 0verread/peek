@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/0verread/peek/internal/cout"
 )
 
 const (
@@ -93,7 +91,7 @@ func parseHeader(headerStr string) http.Header {
 	return headers
 }
 
-func Do(url string, args ...string) {
+func Do(url string, args ...string) (Response, error) {
 	var verb string = Get // default it makes GET request
 	var payload []byte
 	var headers http.Header
@@ -121,18 +119,11 @@ func Do(url string, args ...string) {
 		fmt.Println("Error building request for POST, error:", err)
 		panic(0)
 	}
-	respBody, err := NewHttpClient().makeRequest(req)
+	response, err := NewHttpClient().makeRequest(req)
 	if err != nil {
 		fmt.Println("Error in processing request, error: ", err)
 	}
-	fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
-	// cout.PrettyPrintString(respBody.Status)
-	cout.PrettyPrint([]byte(respBody.Body))
-	// var jsonResp map[string]interface{}
-	// err = json.Unmarshal([]byte(respBody.Body), &jsonResp)
-	// if err != nil {
-	// 	fmt.Println("Error", err)
-	// }
-	// coloredRespBody, _ := prettyjson.Prettify(jsonResp)
-	// fmt.Println(string(coloredRespBody))
+	return response, err
+	// fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
+	// cout.PrettyPrint([]byte(respBody.Body))
 }

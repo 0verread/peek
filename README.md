@@ -8,8 +8,10 @@ I test all the rest apis using curl. lately, I found curl is not being enough. M
 
 ### TODO
 
-- [ ] Json response highlighting
+- [x] Json response highlighting
 - [ ] Test coverage
+- [ ] Go Release
+- [ ] Pre-merge test check
 - [ ] Collection
 
 ### LICENSE

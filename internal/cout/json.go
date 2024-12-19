@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-type unmarshalArrayResp []map[string]interface{}
-
 func unmarshalObject(data []byte, result interface{}) error {
 	switch result.(type) {
 	case map[string]interface{}:
