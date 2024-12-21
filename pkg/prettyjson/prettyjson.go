@@ -1,5 +1,4 @@
 // custom package to make json response colorful
-
 package prettyjson
 
 import (
@@ -21,10 +20,6 @@ const (
 
 func NewFormatter() *Formatter {
 	return &Formatter{}
-}
-
-func (f *Formatter) colorInt(status int) int {
-	return color.New(color.FgGreen).SprintFunc()
 }
 
 func (f *Formatter) colorize(c color.Attribute, s string) string {

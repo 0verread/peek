@@ -14,10 +14,10 @@ func PrettyPrintString(str string) {
 	os.Stdout.Write(coloredStr)
 }
 
-func PrettyPrintStatus(status int) {
-	coloredStatus, _ := prettyjson.Prettify(status)
-	os.Stdout.Write(coloredStatus)
-}
+// func PrettyPrintStatus(latency strint) {
+// 	coloredStatus, _ := prettyjson.PrettyPrintStatus(status)
+// 	os.Stdout.Write(coloredStatus)
+// }
 
 func PrettyPrint(resp []byte) {
 	var err error

@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"strconv"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/0verread/peek/internal/client"
@@ -49,16 +49,13 @@ var rootCmd = &cobra.Command{
 		payload, _ := cmd.Flags().GetString("data")
 		header, _ := cmd.Flags().GetString("header")
 		response, _ := client.Do(args[0], verb, payload, header)
-    // Colorize status and latency
-    statusColor := cout.PrettyPrintStatus(response.Status)
-    latencyColor := color.New(color.FgBlue).SprintFunc()
-
-    statusAndLat := fmt.Sprintf("Status: %s  Time Taken: %s ms\n", statusColor(response.Status), latencyColor(response.Latency))
-    os.Stdout.Write([]byte(statusAndLat))
-
-    cout.PrettyPrint([]byte(response.Body))
+		statusColor := color.New(color.FgGreen).SprintFunc()
+		latencyColor := color.New(color.FgBlue).SprintFunc()
+		statusAndLat := fmt.Sprintf("Status: %s  Time Taken: %s ms\n", statusColor(response.Status), latencyColor(response.Latency))
+		os.Stdout.Write([]byte(statusAndLat))
+		cout.PrettyPrint([]byte(response.Body))
 		return nil
-	}
+	},
 }
 
 func main() {
