@@ -1,5 +1,5 @@
 // custom package to make json response colorful
-package prettyjson
+package prettify
 
 import (
 	"bytes"
@@ -60,6 +60,7 @@ func (f *Formatter) colorMap(m map[string]interface{}, buf *bytes.Buffer) error 
 		}
 	}
 	buf.WriteString(endMap)
+	fmt.Println("buf: ", buf.String())
 	return nil
 }
 

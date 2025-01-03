@@ -1,6 +1,6 @@
 module github.com/0verread/peek
 
-go 1.22.0
+go 1.22
 
 require (
 	github.com/fatih/color v1.18.0

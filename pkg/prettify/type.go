@@ -1,4 +1,4 @@
-package prettyjson
+package prettify
 
 type Formatter struct {
 	DisableColor bool

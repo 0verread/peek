@@ -124,6 +124,4 @@ func Do(url string, args ...string) (Response, error) {
 		fmt.Println("Error in processing request, error: ", err)
 	}
 	return response, err
-	// fmt.Printf("Status: %d  Time Taken: %d ms\n", respBody.Status, respBody.Latency)
-	// cout.PrettyPrint([]byte(respBody.Body))
 }

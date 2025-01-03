@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/0verread/peek/internal/client"
@@ -44,15 +43,12 @@ var rootCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("Running url: ", args[0])
 		verb, _ := cmd.Flags().GetString("verb")
 		payload, _ := cmd.Flags().GetString("data")
 		header, _ := cmd.Flags().GetString("header")
 		response, _ := client.Do(args[0], verb, payload, header)
-		statusColor := color.New(color.FgGreen).SprintFunc()
-		latencyColor := color.New(color.FgBlue).SprintFunc()
-		statusAndLat := fmt.Sprintf("Status: %s  Time Taken: %s ms\n", statusColor(response.Status), latencyColor(response.Latency))
-		os.Stdout.Write([]byte(statusAndLat))
+		cout.Header(args[0])
+		cout.Stats(response.Status, int(response.Latency))
 		cout.PrettyPrint([]byte(response.Body))
 		return nil
 	},
