@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	cjson "github.com/0verread/peek/pkg/json"
 	"github.com/0verread/peek/pkg/prettify"
 )
 
@@ -44,7 +45,7 @@ func PrettyPrint(resp []byte) {
 	switch rawData.(type) {
 	case []interface{}:
 		var result []map[string]interface{}
-		err = UnmarshalResp(resp, &result)
+		err = cjson.UnmarshalResp(resp, &result)
 
 		if err != nil {
 			log.Println("Error in Unmarshal Response, error: ", err)
@@ -52,7 +53,7 @@ func PrettyPrint(resp []byte) {
 		coloredRespBody, err = prettify.Prettify(result)
 	case map[string]interface{}:
 		var result map[string]interface{}
-		err = UnmarshalResp(resp, &result)
+		err = cjson.UnmarshalResp(resp, &result)
 		if err != nil {
 			log.Println("Error in Unmarshal Response, error: ", err)
 		}
