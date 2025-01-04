@@ -1,6 +1,6 @@
 ## peek
 
-a better way to test REST API from your terminal ( no it's NOT a curl wrapper)
+a **better looking**, **colorful** Curl alternative, perfect for testing REST APIs
 
 ### Why do I need this
 

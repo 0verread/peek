@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 	"net/url"
 	"os"
@@ -15,12 +14,8 @@ import (
 var rootCmd = &cobra.Command{
 	Use:     "peek",
 	Version: "0.1.0",
-	Short:   "test apis better way",
+	Short:   "a colorful curl alternative",
 	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
-			return errors.New("Requires an argument")
-		}
-
 		url, err := url.Parse(args[0])
 
 		if err != nil {
