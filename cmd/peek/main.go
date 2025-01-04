@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -22,7 +21,6 @@ var rootCmd = &cobra.Command{
 			return errors.New("Requires an argument")
 		}
 
-		fmt.Println("url: ", args[0])
 		url, err := url.Parse(args[0])
 
 		if err != nil {
@@ -47,7 +45,7 @@ var rootCmd = &cobra.Command{
 		payload, _ := cmd.Flags().GetString("data")
 		header, _ := cmd.Flags().GetString("header")
 		response, _ := client.Do(args[0], verb, payload, header)
-		cout.Header(args[0])
+		cout.Header(args[0], verb)
 		cout.Stats(response.Status, int(response.Latency))
 		cout.PrettyPrint([]byte(response.Body))
 		return nil

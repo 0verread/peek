@@ -8,4 +8,6 @@ const (
 	ClientErrorColor = color.FgRed
 	ServerErrorColor = color.FgRed
 	LatencyColor     = color.FgBlue
+	VerbColor        = color.FgCyan
+	UrlColor         = color.FgGreen
 )

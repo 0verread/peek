@@ -16,10 +16,11 @@ func Stats(status int, latency int) {
 	os.Stdout.Write([]byte(coloredStats))
 }
 
-func Header(url string) {
-	coloredUrl, _ := prettify.Prettify(url)
-	// coloredFormattedUrl := fmt.Sprintf("Url: %v\n", coloredUrl)
-	os.Stdout.Write(coloredUrl)
+func Header(url string, verb string) {
+	coloredVerb := prettify.Verb(verb)
+	coloredUrl := prettify.Url(url)
+	coloredFormattedUrl := fmt.Sprintf("%s %s\n", coloredVerb(verb), coloredUrl(url))
+	os.Stdout.Write([]byte(coloredFormattedUrl))
 }
 
 func Status(status int) {
@@ -52,12 +53,10 @@ func PrettyPrint(resp []byte) {
 	case map[string]interface{}:
 		var result map[string]interface{}
 		err = UnmarshalResp(resp, &result)
-		fmt.Println("result: ", result)
 		if err != nil {
 			log.Println("Error in Unmarshal Response, error: ", err)
 		}
 		coloredRespBody, err = prettify.Prettify(result)
-		fmt.Println("coloredRespBody: ", coloredRespBody)
 	}
 	if err != nil {
 		log.Println("Error in colored Response", err)

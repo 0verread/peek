@@ -18,12 +18,23 @@ const (
 	emptyArray = startArray + endArray
 )
 
+type VerbFunc func(a ...interface{}) string
+type UrlFunc func(a ...interface{}) string
+
 func NewFormatter() *Formatter {
 	return &Formatter{}
 }
 
 func (f *Formatter) colorize(c color.Attribute, s string) string {
 	return color.New(c).SprintFunc()(s)
+}
+
+func Verb(verb string) VerbFunc {
+	return color.New(VerbColor).SprintFunc()
+}
+
+func Url(url string) UrlFunc {
+	return color.New(UrlColor).SprintFunc()
 }
 
 func (f *Formatter) colorString(str string, buf *bytes.Buffer) {
@@ -60,7 +71,6 @@ func (f *Formatter) colorMap(m map[string]interface{}, buf *bytes.Buffer) error 
 		}
 	}
 	buf.WriteString(endMap)
-	fmt.Println("buf: ", buf.String())
 	return nil
 }
 

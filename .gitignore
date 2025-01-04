@@ -1,3 +1,5 @@
 *.swp
 .DS_Store
 peek
+dist/
+goreleaser_Darwin_x86_64/
