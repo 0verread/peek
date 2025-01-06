@@ -5,8 +5,30 @@ a **better looking**, **colorful** Curl alternative, perfect for testing REST AP
 
 ### Install
 
+to install, run the following command
+
+```sh
+curl -sSL https://raw.githubusercontent.com/0verread/peek/main/install.sh | bash
+```
+
+or, to install manually
+
+```sh
+git clone https://github.com/0verread/peek
+cd peek
+go install
+```
 
 ### Usage
+
+```sh
+peek <url>
+```
+example:
+
+```sh
+peek jsonplaceholder.typicode.com/todos/1
+```
 
 ### Why do I need this
 

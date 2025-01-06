@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -12,27 +11,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func buildUrl(u *url.URL) *url.URL {
-	if u.Scheme == "" || u.Host == "" {
-		if strings.HasPrefix(u.Host, "localhost") || strings.HasPrefix(u.Scheme, "localhost") {
-			return &url.URL{
-				Scheme:      "http",
-				Host:        "localhost",
-				Path:        u.Path,
-				RawQuery:    u.RawQuery,
-				RawFragment: u.RawFragment,
-			}
+func buildUrl(u *url.URL) string {
+	urlStr := u.String()
+	if !strings.HasPrefix(urlStr, "http://") && !strings.HasPrefix(urlStr, "https://") {
+		if strings.HasPrefix(urlStr, "localhost") {
+			urlStr = "http://" + urlStr
 		} else {
-			return &url.URL{
-				Scheme:      "https",
-				Host:        u.Host,
-				Path:        u.Path,
-				RawQuery:    u.RawQuery,
-				RawFragment: u.RawFragment,
-			}
+			urlStr = "https://" + urlStr
 		}
 	}
-	return u
+	return urlStr
 }
 
 var rootCmd = &cobra.Command{
@@ -54,18 +42,16 @@ var rootCmd = &cobra.Command{
 			log.Println("error parsing url", err)
 			return err
 		}
-		fmt.Println("url Scheme", u.Scheme)
-		fmt.Println("url Host", u.Host)
-		u = buildUrl(u)
+		urlStr := buildUrl(u)
 		verb, _ := cmd.Flags().GetString("verb")
 		payload, _ := cmd.Flags().GetString("data")
 		header, _ := cmd.Flags().GetString("header")
-		response, err := client.Do(u.String(), verb, payload, header)
+		response, err := client.Do(urlStr, verb, payload, header)
 		if err != nil {
 			log.Println("error making request", err)
 			return err
 		}
-		cout.Header(u.String(), verb)
+		cout.Header(urlStr, verb)
 		cout.Stats(response.Status, int(response.Latency))
 		cout.PrettyPrint([]byte(response.Body))
 		return nil
