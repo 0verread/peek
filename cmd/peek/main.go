@@ -1,46 +1,71 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 	"os"
-
-	"github.com/spf13/cobra"
+	"strings"
 
 	"github.com/0verread/peek/internal/client"
 	"github.com/0verread/peek/internal/cout"
+	"github.com/spf13/cobra"
 )
+
+func buildUrl(u *url.URL) *url.URL {
+	if u.Scheme == "" || u.Host == "" {
+		if strings.HasPrefix(u.Host, "localhost") || strings.HasPrefix(u.Scheme, "localhost") {
+			return &url.URL{
+				Scheme:      "http",
+				Host:        "localhost",
+				Path:        u.Path,
+				RawQuery:    u.RawQuery,
+				RawFragment: u.RawFragment,
+			}
+		} else {
+			return &url.URL{
+				Scheme:      "https",
+				Host:        u.Host,
+				Path:        u.Path,
+				RawQuery:    u.RawQuery,
+				RawFragment: u.RawFragment,
+			}
+		}
+	}
+	return u
+}
 
 var rootCmd = &cobra.Command{
 	Use:     "peek",
 	Version: "0.1.0",
 	Short:   "a colorful curl alternative",
 	Args: func(cmd *cobra.Command, args []string) error {
-		url, err := url.Parse(args[0])
+		_, err := url.Parse(args[0])
 
 		if err != nil {
 			panic(err)
 		}
 
-		port := url.Port()
-
-		if url.Scheme == "http" && port == "" {
-			log.Println("Need port for http request")
-			os.Exit(0)
-		}
-
-		if url.Scheme == "https" && port == "" {
-			port = "441"
-		}
-
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		u, err := url.Parse(args[0])
+		if err != nil {
+			log.Println("error parsing url", err)
+			return err
+		}
+		fmt.Println("url Scheme", u.Scheme)
+		fmt.Println("url Host", u.Host)
+		u = buildUrl(u)
 		verb, _ := cmd.Flags().GetString("verb")
 		payload, _ := cmd.Flags().GetString("data")
 		header, _ := cmd.Flags().GetString("header")
-		response, _ := client.Do(args[0], verb, payload, header)
-		cout.Header(args[0], verb)
+		response, err := client.Do(u.String(), verb, payload, header)
+		if err != nil {
+			log.Println("error making request", err)
+			return err
+		}
+		cout.Header(u.String(), verb)
 		cout.Stats(response.Status, int(response.Latency))
 		cout.PrettyPrint([]byte(response.Body))
 		return nil
